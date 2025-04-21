@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #include <iostream>
 #include <string>
 #include <vector>
@@ -802,4 +801,3 @@ public:
         cout << "Record not found in table: " << tableName << endl;
     }
 };
->>>>>>> 6a1f9b259deeebbb77b188177d0a80768f616538
