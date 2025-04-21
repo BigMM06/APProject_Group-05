@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #include <iostream>
 #include "DataBase.hpp"
 
@@ -277,5 +276,4 @@ int main()
     }
 
     return 0;
->>>>>>> 6a1f9b259deeebbb77b188177d0a80768f616538
 }
