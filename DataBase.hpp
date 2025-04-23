@@ -3,6 +3,13 @@
 #include <vector>
 #include <cctype>
 #include <regex>
+
+#include "Column.hpp"
+#include "Record.hpp"
+#include "Schema.hpp"
+#include "Metadata.hpp"
+
+
 using namespace std;
 
 string detectType(const string &input)
