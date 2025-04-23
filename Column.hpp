@@ -3,6 +3,8 @@
 #include <vector>
 
 using namespace std;
+#ifndef COLUMN_HPP
+#define COLUMN_HPP
 class Column
 {
 public:
@@ -29,3 +31,4 @@ public:
         dataType = columnDataType;
     }
 };
+#endif
