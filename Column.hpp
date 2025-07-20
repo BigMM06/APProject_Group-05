@@ -2,6 +2,8 @@
 #include <string>
 #include <vector>
 
+#include "DataType.hpp"
+
 using namespace std;
 #ifndef COLUMN_HPP
 #define COLUMN_HPP
@@ -9,16 +11,20 @@ class Column
 {
 public:
     string name;
-    string dataType;
+    DataType *dataType;
 
-    Column(const string columnName = "", const string columnDataType = "")
+    Column()
+    {
+        return;
+    }
+    Column(const string columnName, DataType *columnDataType)
         : name(columnName), dataType(columnDataType) {}
 
     string getName() const
     {
         return name;
     }
-    string getDataType() const
+    DataType *getDataType() const
     {
         return dataType;
     }
@@ -26,7 +32,7 @@ public:
     {
         name = columnName;
     }
-    void setDataType(const string &columnDataType)
+    void setDataType(DataType *columnDataType)
     {
         dataType = columnDataType;
     }

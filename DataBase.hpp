@@ -137,100 +137,19 @@ public:
         }
     } dbinfo;
 
-  template <typename... Args>
-    void insertRecord(const string &tableName, Args... args)
-    {
-        constexpr size_t fieldCount = sizeof...(Args);
-
-        int tableIndex = dbinfo.findTable(tableName);
-        if (tableIndex == -1)
-        {
-            cout << "Table not found: " << tableName << endl;
-            return;
-        }
-
-        if (fieldCount == 0)
-        {
-            cout << "Record is empty!" << endl;
-            return;
-        }
-        else if (dbinfo.schema[tableIndex].columns.size() == 0)
-        {
-            cout << "Table " << tableName << " is empty!" << endl;
-            return;
-        }
-
-        string record[fieldCount] = {static_cast<string>(args)...};
-
-        for (int i = 0; i < records.size(); i++)
-        {
-            if (toLowerCase(records[i].metadata.tableName) == toLowerCase(tableName) &&
-                toLowerCase(records[i].recordInfo[0]) == toLowerCase(record[0]) &&
-                !records[i].metadata.isDeleted)
-            {
-                cout << "Record with key " << record[0] << " already exists in table: " << tableName << endl;
-                return;
-            }
-            else if (toLowerCase(records[i].metadata.tableName) == toLowerCase(tableName) &&
-                     toLowerCase(records[i].recordInfo[0]) == toLowerCase(record[0]) &&
-                     records[i].metadata.isDeleted)
-            {
-                records[i].recordInfo.clear();
-                for (int j = 0; j < fieldCount; j++)
-                {
-                    if (dbinfo.schema[tableIndex].columns[j].dataType == detectType(record[j]))
-                    {
-                        records[i].recordInfo.push_back(record[j]);
-                    }
-                    else
-                    {
-                        cout << "Data type mismatch for column: " << dbinfo.schema[tableIndex].columns[j].name << endl;
-                        return;
-                    }
-                }
-                records[i].metadata.isDeleted = false;
-                cout << "Record restored in table: " << tableName << " with new values and record key: " << record[0] << endl;
-                return;
-            }
-        }
-
-        if (dbinfo.schema[tableIndex].columns.size() == fieldCount)
-        {
-            records.push_back(Record());
-            for (int i = 0; i < fieldCount; ++i)
-            {
-                if (dbinfo.schema[tableIndex].columns[i].dataType == detectType(record[i]))
-                {
-                    records.back().recordInfo.push_back(record[i]);
-                }
-                else
-                {
-                    cout << "Data type mismatch for column: " << dbinfo.schema[tableIndex].columns[i].name << endl;
-                    return;
-                }
-            }
-            records.back().metadata.tableName = tableName;
-            cout << "Record inserted successfully into table: " << tableName << endl;
-            cout << "key of this record is the first member of the record : " << record[0] << endl;
-        }
-        else
-        {
-            cout << "Record members count and columns not matched!" << endl;
-        }
-    }
-
-    // I should write insertRecord function with infinite arguments
-    // So if you want to compile and use main file, uncomment  it
-    // void insertRecord(vector<string> record, string tableName)
+    // template <typename... Args>
+    // void insertRecord(const string &tableName, Args... args)
     // {
+    //     constexpr size_t fieldCount = sizeof...(Args);
+
     //     int tableIndex = dbinfo.findTable(tableName);
     //     if (tableIndex == -1)
     //     {
     //         cout << "Table not found: " << tableName << endl;
     //         return;
     //     }
-    //     int specialColumnIndex = dbinfo.schema[tableIndex].findColumn(dbinfo.schema[tableIndex].specialColumn);
-    //     if (record.size() == 0)
+
+    //     if (fieldCount == 0)
     //     {
     //         cout << "Record is empty!" << endl;
     //         return;
@@ -241,19 +160,25 @@ public:
     //         return;
     //     }
 
+    //     string record[fieldCount] = {static_cast<string>(args)...};
+
     //     for (int i = 0; i < records.size(); i++)
     //     {
-    //         if (toLowerCase(records[i].metadata.tableName) == toLowerCase(tableName) && toLowerCase(records[i].recordInfo[0]) == toLowerCase(record[0]) && records[i].metadata.isDeleted == false)
+    //         if (toLowerCase(records[i].metadata.tableName) == toLowerCase(tableName) &&
+    //             toLowerCase(records[i].recordInfo[0]) == toLowerCase(record[0]) &&
+    //             !records[i].metadata.isDeleted)
     //         {
     //             cout << "Record with key " << record[0] << " already exists in table: " << tableName << endl;
     //             return;
     //         }
-    //         else if (toLowerCase(records[i].metadata.tableName) == toLowerCase(tableName) && toLowerCase(records[i].recordInfo[0]) == toLowerCase(record[0]) && records[i].metadata.isDeleted == true)
+    //         else if (toLowerCase(records[i].metadata.tableName) == toLowerCase(tableName) &&
+    //                  toLowerCase(records[i].recordInfo[0]) == toLowerCase(record[0]) &&
+    //                  records[i].metadata.isDeleted)
     //         {
     //             records[i].recordInfo.clear();
-    //             for (int j = 0; j < record.size(); j++)
+    //             for (int j = 0; j < fieldCount; j++)
     //             {
-    //                 if (dbinfo.schema[tableIndex].columns[j].dataType->detectType(record[j]))
+    //                 if (dbinfo.schema[tableIndex].columns[j].dataType == detectType(record[j]))
     //                 {
     //                     records[i].recordInfo.push_back(record[j]);
     //                 }
@@ -265,55 +190,130 @@ public:
     //             }
     //             records[i].metadata.isDeleted = false;
     //             cout << "Record restored in table: " << tableName << " with new values and record key: " << record[0] << endl;
-
-    //             auto search = dbinfo.schema[tableIndex].specialSearchList.find(toLowerCase(record[specialColumnIndex]));
-    //             unsigned int lastRecordIndex = records.size() - 1;
-    //             if (search != dbinfo.schema[tableIndex].specialSearchList.end())
-    //             {
-    //                 search->second.push_back(lastRecordIndex);
-    //             }
-    //             else
-    //             {
-    //                 dbinfo.schema[tableIndex].specialSearchList.insert({toLowerCase(record[specialColumnIndex]), {lastRecordIndex}});
-    //             }
     //             return;
     //         }
     //     }
-    //     if (dbinfo.schema[tableIndex].columns.size() == record.size())
+
+    //     if (dbinfo.schema[tableIndex].columns.size() == fieldCount)
     //     {
     //         records.push_back(Record());
-    //         for (int i = 0; i < record.size(); i++)
+    //         for (int i = 0; i < fieldCount; ++i)
     //         {
-    //             if (dbinfo.schema[tableIndex].columns[i].dataType->detectType(record[i]))
+    //             if (dbinfo.schema[tableIndex].columns[i].dataType == detectType(record[i]))
     //             {
     //                 records.back().recordInfo.push_back(record[i]);
     //             }
     //             else
     //             {
-    //                 cout << "Data type mismatch for column: " << dbinfo.schema[tableIndex].columns[i].name << " should be: " << dbinfo.schema[tableIndex].columns[i].dataType->getType() << endl;
+    //                 cout << "Data type mismatch for column: " << dbinfo.schema[tableIndex].columns[i].name << endl;
     //                 return;
     //             }
     //         }
     //         records.back().metadata.tableName = tableName;
     //         cout << "Record inserted successfully into table: " << tableName << endl;
     //         cout << "key of this record is the first member of the record : " << record[0] << endl;
-
-    //         auto search = dbinfo.schema[tableIndex].specialSearchList.find(toLowerCase(record[specialColumnIndex]));
-    //         unsigned int lastRecordIndex = records.size() - 1;
-    //         if (search != dbinfo.schema[tableIndex].specialSearchList.end())
-    //         {
-    //             search->second.push_back(lastRecordIndex);
-    //         }
-    //         else
-    //         {
-    //             dbinfo.schema[tableIndex].specialSearchList.insert({toLowerCase(record[specialColumnIndex]), {lastRecordIndex}});
-    //         }
     //     }
-    //     else if (dbinfo.schema[tableIndex].columns.size() != record.size())
+    //     else
     //     {
-    //         cout << "Record members count and columns not matched!";
+    //         cout << "Record members count and columns not matched!" << endl;
     //     }
     // }
+
+    // I should write insertRecord function with infinite arguments
+    // So if you want to compile and use main file, uncomment  it
+    void insertRecord(vector<string> record, string tableName)
+    {
+        int tableIndex = dbinfo.findTable(tableName);
+        if (tableIndex == -1)
+        {
+            cout << "Table not found: " << tableName << endl;
+            return;
+        }
+        int specialColumnIndex = dbinfo.schema[tableIndex].findColumn(dbinfo.schema[tableIndex].specialColumn);
+        if (record.size() == 0)
+        {
+            cout << "Record is empty!" << endl;
+            return;
+        }
+        else if (dbinfo.schema[tableIndex].columns.size() == 0)
+        {
+            cout << "Table " << tableName << " is empty!" << endl;
+            return;
+        }
+
+        for (int i = 0; i < records.size(); i++)
+        {
+            if (toLowerCase(records[i].metadata.tableName) == toLowerCase(tableName) && toLowerCase(records[i].recordInfo[0]) == toLowerCase(record[0]) && records[i].metadata.isDeleted == false)
+            {
+                cout << "Record with key " << record[0] << " already exists in table: " << tableName << endl;
+                return;
+            }
+            else if (toLowerCase(records[i].metadata.tableName) == toLowerCase(tableName) && toLowerCase(records[i].recordInfo[0]) == toLowerCase(record[0]) && records[i].metadata.isDeleted == true)
+            {
+                records[i].recordInfo.clear();
+                for (int j = 0; j < record.size(); j++)
+                {
+                    if (dbinfo.schema[tableIndex].columns[j].dataType->detectType(record[j]))
+                    {
+                        records[i].recordInfo.push_back(record[j]);
+                    }
+                    else
+                    {
+                        cout << "Data type mismatch for column: " << dbinfo.schema[tableIndex].columns[j].name << endl;
+                        return;
+                    }
+                }
+                records[i].metadata.isDeleted = false;
+                cout << "Record restored in table: " << tableName << " with new values and record key: " << record[0] << endl;
+
+                auto search = dbinfo.schema[tableIndex].specialSearchList.find(toLowerCase(record[specialColumnIndex]));
+                unsigned int lastRecordIndex = records.size() - 1;
+                if (search != dbinfo.schema[tableIndex].specialSearchList.end())
+                {
+                    search->second.push_back(lastRecordIndex);
+                }
+                else
+                {
+                    dbinfo.schema[tableIndex].specialSearchList.insert({toLowerCase(record[specialColumnIndex]), {lastRecordIndex}});
+                }
+                return;
+            }
+        }
+        if (dbinfo.schema[tableIndex].columns.size() == record.size())
+        {
+            records.push_back(Record());
+            for (int i = 0; i < record.size(); i++)
+            {
+                if (dbinfo.schema[tableIndex].columns[i].dataType->detectType(record[i]))
+                {
+                    records.back().recordInfo.push_back(record[i]);
+                }
+                else
+                {
+                    cout << "Data type mismatch for column: " << dbinfo.schema[tableIndex].columns[i].name << " should be: " << dbinfo.schema[tableIndex].columns[i].dataType->getType() << endl;
+                    return;
+                }
+            }
+            records.back().metadata.tableName = tableName;
+            cout << "Record inserted successfully into table: " << tableName << endl;
+            cout << "key of this record is the first member of the record : " << record[0] << endl;
+
+            auto search = dbinfo.schema[tableIndex].specialSearchList.find(toLowerCase(record[specialColumnIndex]));
+            unsigned int lastRecordIndex = records.size() - 1;
+            if (search != dbinfo.schema[tableIndex].specialSearchList.end())
+            {
+                search->second.push_back(lastRecordIndex);
+            }
+            else
+            {
+                dbinfo.schema[tableIndex].specialSearchList.insert({toLowerCase(record[specialColumnIndex]), {lastRecordIndex}});
+            }
+        }
+        else if (dbinfo.schema[tableIndex].columns.size() != record.size())
+        {
+            cout << "Record members count and columns not matched!";
+        }
+    }
 
     void findRecords(string tableName, string columnName, string value)
     {

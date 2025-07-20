@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <unordered_map>
 #include "Column.hpp"
 using namespace std;
 
@@ -10,6 +11,8 @@ class Schema
 public:
     string tableName;
     vector<Column> columns;
+    string specialColumn;
+    unordered_map<string, vector<unsigned int>> specialSearchList;
 
     Schema(const string name = "") : tableName(name) {}
 
