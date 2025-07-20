@@ -31,6 +31,7 @@ int main()
             cout << "   newrecord - Insert a new record\n";
             cout << "   deleterecord - Delete a record\n";
             cout << "   findrecords - Find record(s) by value\n";
+            cout << "   sfindrecords - Find record(s) by special column\n";
             cout << "   updaterecord - Update a record\n";
         }
         else if (toLowerCase(input) == "newtable")
@@ -41,22 +42,52 @@ int main()
             int columnCount;
             cout << "Enter column count: ";
             cin >> columnCount;
-            string columnName[columnCount], columnDataTypes[columnCount];
+            string columnName[columnCount];
+            DataType *columnDataTypes[columnCount];
             cout << "Enter column names one by one and click 'Enter' button after each one\n";
             for (int i = 0; i < columnCount; i++)
             {
                 cout << "Enter column name: \n";
                 cin.ignore();
                 getline(cin, columnName[i]);
-                cout << "Enter column data type ('int' for integer / 'string' for words / 'float' for floating point numbers): ";
-                cin >> columnDataTypes[i];
-                if (toLowerCase(columnDataTypes[i]) != "int" && toLowerCase(columnDataTypes[i]) != "string" && toLowerCase(columnDataTypes[i]) != "float")
+                cout << "Enter column data type ('int' for integer / 'string' for words / 'float' for floating point numbers / 'date' for date): ";
+                string tempDataType;
+                cin >> tempDataType;
+                if (toLowerCase(tempDataType) != "int" && toLowerCase(tempDataType) != "string" && toLowerCase(tempDataType) != "float" && toLowerCase(tempDataType) != "date")
                 {
                     cout << "Invalid data type! Enter this member again" << endl;
                     i--;
                 }
+                else if (toLowerCase(tempDataType) == "int")
+                {
+                    columnDataTypes[i] = new IntegerType();
+                }
+                else if (toLowerCase(tempDataType) == "string")
+                {
+                    columnDataTypes[i] = new StringType();
+                }
+                else if (toLowerCase(tempDataType) == "float")
+                {
+                    columnDataTypes[i] = new FloatType();
+                }
+                else if (toLowerCase(tempDataType) == "date")
+                {
+                    columnDataTypes[i] = new DateType();
+                }
             }
-            database.dbinfo.insertTable(tableName, columnCount, columnName, columnDataTypes);
+            bool validColumnName = false;
+            string specialColumn;
+            while (!validColumnName)
+            {
+                cout << "Which column is special for searching?\n";
+                cin >> specialColumn;
+                for (string name : columnName)
+                {
+                    if (specialColumn == name)
+                        validColumnName = true;
+                }
+            }
+            database.dbinfo.insertTable(tableName, columnCount, columnName, columnDataTypes, specialColumn);
         }
         else if (toLowerCase(input) == "deletetable")
         {
@@ -128,6 +159,15 @@ int main()
             cout << "Enter the new value: ";
             getline(cin, newValue);
             database.updateRecord(tableName, columnName, key, newValue);
+        }
+        else if (toLowerCase(input) == "sfindrecords")
+        {
+            string tableName, value;
+            cout << "Enter the table name: ";
+            cin >> tableName;
+            cout << "Enter the value: ";
+            cin >> value;
+            database.specialRecordFinder(tableName, value);
         }
         else
         {
